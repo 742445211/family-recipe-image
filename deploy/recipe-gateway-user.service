@@ -1,0 +1,15 @@
+[Unit]
+Description=Family Recipe Image Gateway
+After=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/recipe-image
+Environment=GOPROXY=https://goproxy.cn,direct
+Environment=LD_LIBRARY_PATH=%h/local/lib
+ExecStart=%h/recipe-image/recipe-gateway %h/recipe-image/config.yaml
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=default.target

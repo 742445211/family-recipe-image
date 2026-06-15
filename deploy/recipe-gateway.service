@@ -1,0 +1,17 @@
+[Unit]
+Description=Family Recipe Image Gateway (Pi)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/recipe-image
+Environment=LD_LIBRARY_PATH=/usr/local/lib
+ExecStart=/opt/recipe-image/recipe-gateway /opt/recipe-image/config.yaml
+Restart=always
+RestartSec=5
+MemoryMax=3G
+
+[Install]
+WantedBy=multi-user.target
