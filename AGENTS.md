@@ -24,8 +24,8 @@ internal/
   protocol/            # WebSocket 消息类型
 deploy/                # install-deps.sh、systemd、nginx 补丁
 docs/                  # ws-protocol.md、firdgemate-model.md
-scripts/               # 测试/调试脚本（detect_*、mock WSS server）
-tools/                 # 正式辅助工具（OSS 识别、DB 查询等）
+scripts/               # 本地测试脚本（gitignore，不入库）
+tools/                 # 正式辅助工具（如 recognize_oss_key）
 ```
 
 ## 变更部署流程

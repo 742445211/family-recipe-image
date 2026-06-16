@@ -75,22 +75,16 @@ go test ./...
 GOOS=linux GOARCH=arm64 CGO_ENABLED=0 go build -o recipe-gateway ./cmd/gateway  # stub firdgemate
 ```
 
-Mock WSS server（需 TLS 证书）：
+`scripts/` 为本地测试脚本（已 gitignore，各环境自行维护），例如：
 
-```bash
-GATEWAY_TOKEN=test-token TLS_CERT=cert.pem TLS_KEY=key.pem go run ./scripts/mock_ws_server.go
-```
+- `detect_once.go` — 本地图片识别
+- `mock_ws_server.go` — 本地 Mock WSS，无需连阿里云即可调试 gateway
+- `query_scans.py` — 在 ali_24 上查 fridge_scans 表
 
-树莓派上按 OSS key 识别（正式工具）：
+树莓派上按 OSS key 识别（`tools/`，随仓库同步）：
 
 ```bash
 go run -tags cgo ./tools/recognize_oss_key.go recipe/xxx.jpg
-```
-
-本地图片测试识别：
-
-```bash
-go run -tags cgo ./scripts/detect_once.go /path/to/image.jpg
 ```
 
 ## SSH 别名
