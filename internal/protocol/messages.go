@@ -14,10 +14,15 @@ const (
 
 	StatusOK    = "ok"
 	StatusError = "error"
+
+	ScopeFridge = "fridge"
 )
 
+// TaskMeta 任务元数据；冰箱识别使用 scope=fridge + scan_id。
 type TaskMeta struct {
 	RecipeID uint64 `json:"recipe_id,omitempty"`
+	Scope    string `json:"scope,omitempty"`
+	ScanID   uint64 `json:"scan_id,omitempty"`
 }
 
 type TaskMessage struct {
@@ -26,8 +31,8 @@ type TaskMessage struct {
 	Action  string          `json:"action"`
 	OssKey  string          `json:"oss_key"`
 	OssURL  string          `json:"oss_url,omitempty"`
-	Meta    TaskMeta        `json:"meta,omitempty"`
-	RawMeta json.RawMessage `json:"-"`
+	Meta    json.RawMessage `json:"meta,omitempty"`
+	Parsed  TaskMeta        `json:"-"`
 }
 
 type CompressDetail struct {
@@ -40,8 +45,14 @@ type CompressDetail struct {
 	CompressedBytes int64  `json:"compressed_bytes,omitempty"`
 }
 
+type RecognizeItem struct {
+	Name   string `json:"name"`
+	Amount string `json:"amount,omitempty"`
+}
+
 type RecognizeDetail struct {
-	Ingredients []string `json:"ingredients,omitempty"`
+	Ingredients []string        `json:"ingredients,omitempty"`
+	Items       []RecognizeItem `json:"items,omitempty"`
 }
 
 type TaskResultMessage struct {
@@ -52,7 +63,7 @@ type TaskResultMessage struct {
 	OssKey   string          `json:"oss_key"`
 	ErrorMsg string          `json:"error_msg,omitempty"`
 	Detail   json.RawMessage `json:"detail,omitempty"`
-	Meta     TaskMeta        `json:"meta,omitempty"`
+	Meta     json.RawMessage `json:"meta,omitempty"`
 }
 
 type RegisteredMessage struct {
@@ -72,10 +83,33 @@ func MarshalDetail(v any) (json.RawMessage, error) {
 	return json.Marshal(v)
 }
 
+func ParseTaskMeta(raw json.RawMessage) TaskMeta {
+	var m TaskMeta
+	if len(raw) > 0 {
+		_ = json.Unmarshal(raw, &m)
+	}
+	return m
+}
+
 func ParseTask(data []byte) (*TaskMessage, error) {
 	var msg TaskMessage
 	if err := json.Unmarshal(data, &msg); err != nil {
 		return nil, err
 	}
+	msg.Parsed = ParseTaskMeta(msg.Meta)
 	return &msg, nil
+}
+
+func NewRecognizeDetail(names []string) *RecognizeDetail {
+	items := make([]RecognizeItem, 0, len(names))
+	for _, name := range names {
+		if name == "" {
+			continue
+		}
+		items = append(items, RecognizeItem{Name: name})
+	}
+	return &RecognizeDetail{
+		Ingredients: names,
+		Items:       items,
+	}
 }

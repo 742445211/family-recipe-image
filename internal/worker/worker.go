@@ -113,5 +113,5 @@ func (w *RecognizeWorker) Run(task *protocol.TaskMessage) (*protocol.RecognizeDe
 	if err != nil {
 		return nil, err
 	}
-	return &protocol.RecognizeDetail{Ingredients: ingredients}, nil
+	return protocol.NewRecognizeDetail(ingredients), nil
 }

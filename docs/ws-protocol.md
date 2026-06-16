@@ -77,14 +77,32 @@ GIF 跳过：
 { "detail": { "skipped": true, "reason": "gif_not_supported" } }
 ```
 
-识别成功：
+识别成功（菜谱 `recipe_id` 或冰箱 `scope=fridge`）：
 
 ```json
 {
-  "detail": { "ingredients": ["苹果", "胡萝卜"] },
-  "meta": { "recipe_id": 123 }
+  "type": "task_result",
+  "task_id": "uuid",
+  "status": "ok",
+  "action": "recognize",
+  "detail": {
+    "ingredients": ["苹果", "胡萝卜"],
+    "items": [
+      { "name": "苹果" },
+      { "name": "胡萝卜" }
+    ]
+  },
+  "meta": { "scope": "fridge", "scan_id": 3 }
 }
 ```
+
+冰箱任务下发 `meta`：
+
+```json
+{ "scope": "fridge", "scan_id": 123 }
+```
+
+网关应 **原样回传 `meta`**；`task_id` 必须与下发一致。
 
 ### ping / pong
 

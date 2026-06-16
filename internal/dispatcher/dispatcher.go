@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"log"
 	"sync"
+	"time"
 
 	"recipe-image/internal/protocol"
 	"recipe-image/internal/worker"
@@ -52,47 +53,69 @@ func (d *Dispatcher) Wait() {
 }
 
 func (d *Dispatcher) handle(task *protocol.TaskMessage) {
-	switch task.Action {
-	case protocol.ActionCompress:
-		detail, err := d.compress.Run(task)
-		if err != nil {
-			d.sendError(task, err.Error())
-			return
+	log.Printf("[worker] start task=%s action=%s key=%s scope=%s scan_id=%d",
+		task.TaskID, task.Action, task.OssKey, task.Parsed.Scope, task.Parsed.ScanID)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Minute)
+	defer cancel()
+
+	done := make(chan struct{})
+	var (
+		result *protocol.TaskResultMessage
+	)
+	go func() {
+		defer close(done)
+		switch task.Action {
+		case protocol.ActionCompress:
+			detail, err := d.compress.Run(task)
+			if err != nil {
+				result = d.errorResult(task, err.Error())
+				return
+			}
+			raw, _ := protocol.MarshalDetail(detail)
+			result = &protocol.TaskResultMessage{
+				Type:   protocol.TypeTaskResult,
+				TaskID: task.TaskID,
+				Status: protocol.StatusOK,
+				Action: task.Action,
+				OssKey: task.OssKey,
+				Detail: raw,
+				Meta:   task.Meta,
+			}
+		case protocol.ActionRecognize:
+			detail, err := d.recognize.Run(task)
+			if err != nil {
+				result = d.errorResult(task, err.Error())
+				return
+			}
+			raw, _ := protocol.MarshalDetail(detail)
+			result = &protocol.TaskResultMessage{
+				Type:   protocol.TypeTaskResult,
+				TaskID: task.TaskID,
+				Status: protocol.StatusOK,
+				Action: task.Action,
+				OssKey: task.OssKey,
+				Detail: raw,
+				Meta:   task.Meta,
+			}
+		default:
+			result = d.errorResult(task, "unknown action: "+task.Action)
 		}
-		raw, _ := protocol.MarshalDetail(detail)
-		d.send(&protocol.TaskResultMessage{
-			Type:   protocol.TypeTaskResult,
-			TaskID: task.TaskID,
-			Status: protocol.StatusOK,
-			Action: task.Action,
-			OssKey: task.OssKey,
-			Detail: raw,
-			Meta:   task.Meta,
-		})
-	case protocol.ActionRecognize:
-		detail, err := d.recognize.Run(task)
-		if err != nil {
-			d.sendError(task, err.Error())
-			return
+	}()
+
+	select {
+	case <-ctx.Done():
+		d.sendError(task, "task timeout")
+	case <-done:
+		if result != nil {
+			log.Printf("[worker] done task=%s status=%s action=%s", task.TaskID, result.Status, result.Action)
+			d.send(result)
 		}
-		raw, _ := protocol.MarshalDetail(detail)
-		d.send(&protocol.TaskResultMessage{
-			Type:   protocol.TypeTaskResult,
-			TaskID: task.TaskID,
-			Status: protocol.StatusOK,
-			Action: task.Action,
-			OssKey: task.OssKey,
-			Detail: raw,
-			Meta:   task.Meta,
-		})
-	default:
-		d.sendError(task, "unknown action: "+task.Action)
 	}
 }
 
-func (d *Dispatcher) sendError(task *protocol.TaskMessage, msg string) {
-	log.Printf("[worker] task %s error: %s", task.TaskID, msg)
-	d.send(&protocol.TaskResultMessage{
+func (d *Dispatcher) errorResult(task *protocol.TaskMessage, msg string) *protocol.TaskResultMessage {
+	return &protocol.TaskResultMessage{
 		Type:     protocol.TypeTaskResult,
 		TaskID:   task.TaskID,
 		Status:   protocol.StatusError,
@@ -100,7 +123,12 @@ func (d *Dispatcher) sendError(task *protocol.TaskMessage, msg string) {
 		OssKey:   task.OssKey,
 		ErrorMsg: msg,
 		Meta:     task.Meta,
-	})
+	}
+}
+
+func (d *Dispatcher) sendError(task *protocol.TaskMessage, msg string) {
+	log.Printf("[worker] task %s error: %s", task.TaskID, msg)
+	d.send(d.errorResult(task, msg))
 }
 
 func MustMarshal(v any) json.RawMessage {

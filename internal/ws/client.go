@@ -144,6 +144,8 @@ func (c *Client) handleMessage(ctx context.Context, data []byte) error {
 		if err != nil {
 			return err
 		}
+		log.Printf("[ws] task received id=%s action=%s key=%s meta=%s",
+			task.TaskID, task.Action, task.OssKey, string(task.Meta))
 		c.dispatcher.Submit(ctx, task)
 	case protocol.TypeRegistered:
 		var msg protocol.RegisteredMessage
@@ -167,6 +169,7 @@ func (c *Client) SendResult(msg *protocol.TaskResultMessage) {
 		log.Printf("[ws] drop result (offline) task=%s", msg.TaskID)
 		return
 	}
+	log.Printf("[ws] send result task=%s status=%s action=%s", msg.TaskID, msg.Status, msg.Action)
 	c.mu.Lock()
 	err := conn.WriteJSON(msg)
 	c.mu.Unlock()
