@@ -81,6 +81,18 @@ Mock WSS server（需 TLS 证书）：
 GATEWAY_TOKEN=test-token TLS_CERT=cert.pem TLS_KEY=key.pem go run ./scripts/mock_ws_server.go
 ```
 
+树莓派上按 OSS key 识别（正式工具）：
+
+```bash
+go run -tags cgo ./tools/recognize_oss_key.go recipe/xxx.jpg
+```
+
+本地图片测试识别：
+
+```bash
+go run -tags cgo ./scripts/detect_once.go /path/to/image.jpg
+```
+
 ## SSH 别名
 
 - 树莓派：`ssh raspberry`

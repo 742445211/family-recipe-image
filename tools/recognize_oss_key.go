@@ -1,6 +1,6 @@
 //go:build ignore
 
-// 本地测试：从 OSS 下载并识别，用法 go run ./scripts/recognize_oss_key.go <oss_key>
+// 从 OSS 下载并识别。用法 go run -tags cgo ./tools/recognize_oss_key.go <oss_key>
 package main
 
 import (

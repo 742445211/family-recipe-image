@@ -7,5 +7,4 @@ third_party/*.so
 third_party/*.dll
 models/*.onnx
 models/*.pt
-local/
 .DS_Store
