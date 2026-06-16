@@ -24,7 +24,27 @@ internal/
   protocol/            # WebSocket 消息类型
 deploy/                # install-deps.sh、systemd、nginx 补丁
 docs/                  # ws-protocol.md、firdgemate-model.md
+scripts/               # 可提交的辅助脚本（如 mock WSS server）
+local/                 # 本地临时测试脚本，已 gitignore，勿提交
 ```
+
+## 变更部署流程
+
+**先在本机提交并推送到 GitHub，再去树莓派拉取更新。** 不要直接在 Pi 上改代码而不回传仓库。
+
+1. **本机**（`F:\AI_Project\family-recipe-image`）：
+   ```bash
+   git add -A && git commit -m "..." && git push origin master
+   ```
+2. **树莓派**（`ssh raspberry`，代码目录 `~/recipe-image`）：
+   ```bash
+   cd ~/recipe-image && git pull origin master
+   export CGO_ENABLED=1 GOPROXY=https://goproxy.cn,direct
+   export LD_LIBRARY_PATH=$HOME/local/lib:/usr/local/lib
+   go build -o recipe-gateway ./cmd/gateway
+   systemctl --user restart recipe-gateway
+   journalctl --user -u recipe-gateway -f
+   ```
 
 ## 部署
 
