@@ -46,7 +46,7 @@ firdgemate:
   model_path: "{h}/recipe-image/models/culinaryvision.onnx"
   onnx_lib_path: "{h}/local/lib/libonnxruntime.so"
   num_classes: 47
-  conf_threshold: 0.45
+  conf_threshold: 0.30
   iou_threshold: 0.5
   input_size: 640
   intra_op_threads: 4

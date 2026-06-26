@@ -118,7 +118,7 @@ func applyDefaults(c *Config) {
 		c.Compress.FfmpegPath = "/usr/bin/ffmpeg"
 	}
 	if c.Firdgemate.ConfThreshold == 0 {
-		c.Firdgemate.ConfThreshold = 0.45
+		c.Firdgemate.ConfThreshold = 0.30
 	}
 	if c.Firdgemate.IouThreshold == 0 {
 		c.Firdgemate.IouThreshold = 0.5
