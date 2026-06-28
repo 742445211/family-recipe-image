@@ -1,6 +1,17 @@
 package firdgemate
 
-// CulinaryVision-YOLOv8n: 47 ingredient classes (HimanshuRay/CulinaryVision-YOLOv8n)
+// Roboflow ingredients-detection-yolov8-npkkb v3: 53 classes (family-v1 fine-tuned)
+var ingredientLabels = []string{
+	"1", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19",
+	"2", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29",
+	"3", "4", "5", "6", "7", "8", "9",
+	"anchovy", "artichoke", "bell pepper", "broccoli", "cabbage", "carrot",
+	"cauliflower", "chicken breast", "cucumber", "egg", "eggplant", "garlic",
+	"green chilli pepper", "leek", "lemon", "lettuce", "mince", "onion",
+	"parsley", "red meat", "tomato", "undefined", "white beans", "white button mushroom",
+}
+
+// CulinaryVision-YOLOv8n legacy: 47 classes (culinaryvision.onnx)
 var culinaryLabels = []string{
 	"almond", "apple", "asparagus", "avocado", "banana", "beans", "beet", "bell pepper",
 	"blackberry", "blueberry", "broccoli", "brussels sprouts", "cabbage", "carrot",
@@ -12,6 +23,30 @@ var culinaryLabels = []string{
 }
 
 var englishToChinese = map[string]string{
+	"anchovy":               "鳀鱼",
+	"artichoke":             "朝鲜蓟",
+	"bell pepper":           "甜椒",
+	"broccoli":              "西兰花",
+	"cabbage":               "卷心菜",
+	"carrot":                "胡萝卜",
+	"cauliflower":           "花椰菜",
+	"chicken breast":        "鸡胸肉",
+	"cucumber":              "黄瓜",
+	"egg":                   "鸡蛋",
+	"eggplant":              "茄子",
+	"garlic":                "大蒜",
+	"green chilli pepper":   "青辣椒",
+	"leek":                  "韭葱",
+	"lemon":                 "柠檬",
+	"lettuce":               "生菜",
+	"mince":                 "肉末",
+	"onion":                 "洋葱",
+	"parsley":               "欧芹",
+	"red meat":              "红肉",
+	"tomato":                "番茄",
+	"white beans":           "白豆",
+	"white button mushroom": "白蘑菇",
+	// legacy CulinaryVision
 	"almond":           "杏仁",
 	"apple":            "苹果",
 	"asparagus":        "芦笋",
@@ -19,32 +54,20 @@ var englishToChinese = map[string]string{
 	"banana":           "香蕉",
 	"beans":            "豆类",
 	"beet":             "甜菜",
-	"bell pepper":      "甜椒",
 	"blackberry":       "黑莓",
 	"blueberry":        "蓝莓",
-	"broccoli":         "西兰花",
 	"brussels sprouts": "抱子甘蓝",
-	"cabbage":          "卷心菜",
-	"carrot":           "胡萝卜",
-	"cauliflower":      "花椰菜",
 	"celery":           "芹菜",
 	"cherry":           "樱桃",
 	"corn":             "玉米",
-	"cucumber":         "黄瓜",
-	"egg":              "鸡蛋",
-	"eggplant":         "茄子",
-	"garlic":           "大蒜",
 	"grape":            "葡萄",
 	"green bean":       "四季豆",
 	"green onion":      "葱",
 	"hot pepper":       "辣椒",
 	"kiwi":             "猕猴桃",
-	"lemon":            "柠檬",
-	"lettuce":          "生菜",
 	"lime":             "青柠",
 	"mandarin":         "橘子",
 	"mushroom":         "蘑菇",
-	"onion":            "洋葱",
 	"orange":           "橙子",
 	"pattypan squash":  "扁圆南瓜",
 	"pea":              "豌豆",
@@ -56,7 +79,6 @@ var englishToChinese = map[string]string{
 	"radish":           "萝卜",
 	"raspberry":        "树莓",
 	"strawberry":       "草莓",
-	"tomato":           "番茄",
 	"vegetable marrow": "西葫芦",
 	"watermelon":       "西瓜",
 }
@@ -76,9 +98,15 @@ func ToChineseIngredient(english string) string {
 }
 
 func DefaultLabels(numClasses int) []string {
-	if numClasses == len(culinaryLabels) || numClasses == 0 {
+	switch numClasses {
+	case len(ingredientLabels):
+		return ingredientLabels
+	case len(culinaryLabels):
 		return culinaryLabels
+	default:
+		if numClasses == 0 {
+			return culinaryLabels
+		}
+		return nil
 	}
-	// fallback COCO subset for yolov8n (80 classes)
-	return nil
 }

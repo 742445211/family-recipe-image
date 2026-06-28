@@ -27,9 +27,9 @@ compress:
   ffmpeg_path: "/usr/bin/ffmpeg"
 
 firdgemate:
-  model_path: "/home/zjc/recipe-image/models/culinaryvision.onnx"
+  model_path: "/home/zjc/recipe-image/models/family-ingredients.onnx"
   onnx_lib_path: "/home/zjc/local/lib/libonnxruntime.so"
-  num_classes: 47
+  num_classes: 53
   conf_threshold: 0.30
   iou_threshold: 0.5
   input_size: 640
