@@ -7,5 +7,8 @@ third_party/*.so
 third_party/*.dll
 models/*.onnx
 models/*.pt
+models/runs/
+data/
 scripts/
 .DS_Store
+data/.roboflow.env

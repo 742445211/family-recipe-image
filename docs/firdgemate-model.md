@@ -29,10 +29,10 @@ firdgemate:
 
 ### 1. 准备数据集
 
-推荐 [Roboflow](https://universe.roboflow.com/) 或自建标注：
+推荐 [Roboflow Universe 公开集](https://universe.roboflow.com/visual-captioning-for-food/ingredients-detection-yolov8-npkkb) 或自建标注。  
+**只下载、不上传私有数据**的操作见 [roboflow-download-guide.md](roboflow-download-guide.md)。
 
 - 格式：**YOLOv8**（每张图对应 `.txt` 标注 + `data.yaml`）
-- 示例公开集：[Ingredients detection YOLOv8](https://universe.roboflow.com/visual-captioning-for-food/ingredients-detection-yolov8-npkkb)（12547 张）
 
 `data.yaml` 示例：
 
