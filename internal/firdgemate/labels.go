@@ -97,6 +97,19 @@ func ToChineseIngredient(english string) string {
 	return english
 }
 
+// IsSemanticLabel 过滤 Roboflow 数据集中纯数字占位类名（如 "17"），仅返回有语义的食材名。
+func IsSemanticLabel(name string) bool {
+	if name == "" || name == "undefined" || name == "unknown" {
+		return false
+	}
+	for _, c := range name {
+		if c < '0' || c > '9' {
+			return true
+		}
+	}
+	return false
+}
+
 func DefaultLabels(numClasses int) []string {
 	switch numClasses {
 	case len(ingredientLabels):

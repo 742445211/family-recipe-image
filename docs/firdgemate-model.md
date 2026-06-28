@@ -1,20 +1,23 @@
 # firdgemate 模型说明
 
-## 当前部署模型
+## 当前部署模型（树莓派）
 
-项目使用 **[CulinaryVision-YOLOv8n](https://huggingface.co/HimanshuRay/CulinaryVision-YOLOv8n)**（MIT 许可）：
+**family-v1** — 基于 [Roboflow ingredients-detection-yolov8](https://universe.roboflow.com/visual-captioning-for-food/ingredients-detection-yolov8-npkkb) 微调：
 
-- **47 类常见食材**（苹果、番茄、胡萝卜、鸡蛋等）
-- 已导出为 ONNX：`models/culinaryvision.onnx`
-- 配置项 `firdgemate.num_classes: 47`
+- **53 类**（含 tomato、egg、onion 等语义类；前 29 类为数据集数字占位，网关侧已过滤）
+- ONNX：`models/family-ingredients.onnx`
+- 配置项 `firdgemate.num_classes: 53`
+- 训练：本机 RTX 3060 Ti，90 epoch，mAP50 ≈ 0.766
+
+旧模型 **CulinaryVision-YOLOv8n**（47 类）仍保留于 `models/culinaryvision.onnx`，可回滚。
 
 ## 配置（config.yaml）
 
 ```yaml
 firdgemate:
-  model_path: "/home/zjc/recipe-image/models/culinaryvision.onnx"
+  model_path: "/home/zjc/recipe-image/models/family-ingredients.onnx"
   onnx_lib_path: "/home/zjc/local/lib/libonnxruntime.so"
-  num_classes: 47          # 必须与模型类别数一致
+  num_classes: 53          # 必须与模型类别数一致
   conf_threshold: 0.30
   iou_threshold: 0.5
   input_size: 640
@@ -22,6 +25,11 @@ firdgemate:
 ```
 
 更换模型后务必同步修改 `num_classes` 和 `internal/firdgemate/labels.go` 中的类别列表。
+
+### 后续 v2（自家图）
+
+1. 标注 `data/custom/`（含误判样本）
+2. 合并 Roboflow + custom → 增量微调 → 替换 Pi 上 `family-ingredients.onnx`
 
 ---
 

@@ -98,7 +98,11 @@ func (d *Detector) Detect(imagePath string) ([]string, error) {
 	seen := map[string]bool{}
 	var ingredients []string
 	for _, b := range boxes {
-		name := ToChineseIngredient(ClassName(b.ClassID, labels))
+		en := ClassName(b.ClassID, labels)
+		if !IsSemanticLabel(en) {
+			continue
+		}
+		name := ToChineseIngredient(en)
 		if !seen[name] {
 			seen[name] = true
 			ingredients = append(ingredients, name)
